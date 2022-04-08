@@ -41,7 +41,6 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   expandable: ^5.0.1
-  fluttertoast: ^8.0.7
   logger: ^1.1.0
   flutter_easyloading: ^3.0.0
   flutter_secure_storage: ^5.0.2

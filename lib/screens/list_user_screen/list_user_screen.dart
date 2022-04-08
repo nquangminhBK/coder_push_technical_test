@@ -2,7 +2,7 @@ import 'package:coder_push_interview/screens/list_user_screen/list_user_controll
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ListUserScreen extends GetWidget<ListUserController> {
+class ListUserScreen extends StatelessWidget {
   const ListUserScreen({Key? key}) : super(key: key);
 
   @override
@@ -29,7 +29,7 @@ class ListUserScreen extends GetWidget<ListUserController> {
           width: double.infinity,
           height: double.infinity,
           child: GetBuilder<ListUserController>(
-            builder: (_) {
+            builder: (controller) {
               return ListView.builder(
                   itemCount: controller.listUsers.value.length,
                   itemBuilder: (context, index) {

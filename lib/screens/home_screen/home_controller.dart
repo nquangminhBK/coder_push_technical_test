@@ -5,6 +5,7 @@ import 'package:coder_push_interview/db_sources/user_api.dart';
 import 'package:coder_push_interview/db_sources/user_local_db.dart';
 import 'package:coder_push_interview/models/user_detail_model.dart';
 import 'package:coder_push_interview/models/user_response_model.dart';
+import 'package:coder_push_interview/screens/list_user_screen/list_user_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -13,24 +14,25 @@ enum CardStatus { like, dislike, superLike }
 class HomeScreenController extends GetxController {
   static const limit = 20;
   final userRepository = Get.find<UserRepository>();
-  Rx<bool> isDragging = Rx<bool>(false);
+  Rx<bool> isDragging = RxBool(false);
   Rx<Offset> position = Rx<Offset>(Offset.zero);
-  Rx<Size> screenSize = Rx<Size>(Size.zero);
-  Rx<double> angle = Rx<double>(0);
+  Rx<Size> screenSize = Size.zero.obs;
+  Rx<double> angle = RxDouble(0);
 
   Rx<List<UserBasicInfo>?> listUserToShow = Rx<List<UserBasicInfo>?>([]);
 
-  Rx<int> currentIndex = Rx<int>(0);
-  Rx<int> ageUserToShow = Rx<int>(-1);
+  Rx<int> currentIndex = RxInt(0);
+  Rx<int> ageUserToShow = RxInt(-1);
   String currentUserId = "";
-  UserBasicInfo? currentUser ;
+  UserBasicInfo? currentUser;
+
   int currentPage = 0;
 
   @override
   void onInit() async {
     listUserToShow.value = await getListUser(currentPage);
     update();
-    if(listUserToShow.value!= null){
+    if (listUserToShow.value != null) {
       currentUserId = listUserToShow.value![0].id!;
       currentUser = listUserToShow.value![0];
       getUserDetail(currentUserId);
@@ -41,6 +43,7 @@ class HomeScreenController extends GetxController {
       getUserDetail(idUserShowing);
       await loadMore(index);
     });
+    super.onInit();
   }
 
   getUserDetail(String id) async {
@@ -149,43 +152,52 @@ class HomeScreenController extends GetxController {
     }
   }
 
-  void like() {
+  like() async {
     angle.value = 20;
     position.value += Offset(2 * screenSize.value.width, 0);
     _nextCard();
     currentIndex.value++;
     ageUserToShow.value = -1;
-    print("like ${currentUser!.lastName!}");
-    userRepository.addToLikedUserBox(currentUser!);
+    await addToLikeList();
     update();
   }
 
-  void dislike() {
+  dislike() async {
     angle.value = -20;
     position.value -= Offset(2 * screenSize.value.width, 0);
     _nextCard();
     currentIndex.value++;
     ageUserToShow.value = -1;
-    print("dislike ${currentUser!.lastName!}");
-    userRepository.addToDislikedUserBox(currentUser!);
+    await addToDislikeList();
     update();
   }
 
-  void superLike() {
+  superLike() async {
     angle.value = 0;
     position.value -= Offset(0, screenSize.value.height);
     update();
     _nextCard();
     currentIndex.value++;
     ageUserToShow.value = -1;
-    print("like ${currentUser!.lastName!}");
-    userRepository.addToLikedUserBox(currentUser!);
+    await addToLikeList();
     update();
+  }
+
+  addToLikeList() async {
+    bool isUserAlreadyLike =
+        await userRepository.checkIfUserAlreadyInTheBox(currentUser!.id!);
+    if (!isUserAlreadyLike) userRepository.addToLikedUserBox(currentUser!);
+  }
+
+  addToDislikeList() async {
+    bool isUserAlreadyDislike =
+        await userRepository.checkIfUserAlreadyInTheBox(currentUser!.id!);
+    if (!isUserAlreadyDislike) userRepository.addToDislikedUserBox(currentUser!);
   }
 
   Future _nextCard() async {
     if (listUserToShow.value == null || listUserToShow.value!.isEmpty) return;
-    await Future.delayed(Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 200));
     var newList = listUserToShow.value!;
     newList.removeAt(0);
     listUserToShow.value = newList;

@@ -39,4 +39,12 @@ class UserRepository {
     final box = await dislikedUserBox();
     await box.put(user.id, user);
   }
+
+  Future<bool> checkIfUserAlreadyInTheBox(String userId) async {
+    final boxDislike = await dislikedUserBox();
+    final boxLike = await likedUserBox();
+    if (boxDislike.get(userId, defaultValue: null) == null) return false;
+    if (boxLike.get(userId, defaultValue: null) == null) return false;
+    return true;
+  }
 }

@@ -4,7 +4,7 @@ import 'package:coder_push_interview/widgets/tinder_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends GetWidget<HomeScreenController> {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +32,7 @@ class HomeScreen extends GetWidget<HomeScreenController> {
                           .toList(),
                     ),
                   ),
-                  buildButtonsAction()
+                  buildButtonsAction(controller)
                 ],
               )
             : Container();
@@ -48,7 +48,7 @@ class HomeScreen extends GetWidget<HomeScreenController> {
         children: [
           InkWell(
             onTap: (){
-              Get.toNamed(Routes.LIST_USER, arguments: {"type" : "like"});
+              Get.offAndToNamed(Routes.LIST_USER, arguments: {"type" : "like"});
             },
             child: Row(
               children: const [Icon(Icons.favorite), Text("Like list")],
@@ -56,7 +56,7 @@ class HomeScreen extends GetWidget<HomeScreenController> {
           ),
           InkWell(
             onTap: (){
-              Get.toNamed(Routes.LIST_USER, arguments: {"type" : "dislike"});
+              Get.offAndToNamed(Routes.LIST_USER, arguments: {"type" : "dislike"});
             },
             child: Row(
               children: const [Icon(Icons.clear), Text("dislike list")],
@@ -67,7 +67,7 @@ class HomeScreen extends GetWidget<HomeScreenController> {
     );
   }
 
-  Widget buildButtonsAction() {
+  Widget buildButtonsAction(controller) {
     final status = controller.getStatus();
     final isLike = status == CardStatus.like;
     final isDislike = status == CardStatus.dislike;
